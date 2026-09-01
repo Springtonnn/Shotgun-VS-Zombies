@@ -136,7 +136,7 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({ engine, scanlines }) => 
     }
   }, []);
 
-  // Main Game Loop with Fixed 60 FPS Time-Step (eliminates speed differences across 60Hz/120Hz/144Hz/240Hz monitors)
+  // Main Game Loop with Fixed 120 FPS Time-Step (eliminates speed differences across 60Hz/120Hz/144Hz/240Hz monitors)
   const gameLoop = useCallback((now: number) => {
     let frameTime = (now - lastTimeRef.current) / 1000;
     lastTimeRef.current = now;
@@ -146,10 +146,10 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({ engine, scanlines }) => 
     if (frameTime < 0) frameTime = 0;
 
     accumulatorRef.current += frameTime;
-    const FIXED_TIME_STEP = 1 / 60; // Exact 60 updates per second (16.66ms per tick)
+    const FIXED_TIME_STEP = 1 / 120; // Exact 120 updates per second (8.33ms per tick)
     let updateTicks = 0;
 
-    while (accumulatorRef.current >= FIXED_TIME_STEP && updateTicks < 5) {
+    while (accumulatorRef.current >= FIXED_TIME_STEP && updateTicks < 10) {
       engine.update(FIXED_TIME_STEP);
       accumulatorRef.current -= FIXED_TIME_STEP;
       updateTicks++;
