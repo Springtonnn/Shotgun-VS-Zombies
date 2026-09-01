@@ -1,0 +1,6 @@
+{
+  "name": "Shotgun vs Zombies",
+  "description": "Retro Windows 95 side-scrolling 2D zombie shooter featuring a traffic cone pictogram hero, shotgun blast, sliding strike, melee bash, 3 stages, Giga Mecha-Z robot boss, and mobile touch controls with landscape rotation support.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
