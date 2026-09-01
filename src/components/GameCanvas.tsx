@@ -17,6 +17,7 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({ engine, scanlines }) => 
   const rendererRef = useRef<GameRenderer | null>(null);
   const requestRef = useRef<number>(0);
   const lastTimeRef = useRef<number>(performance.now());
+  const accumulatorRef = useRef<number>(0);
   const activeAimTouchIdRef = useRef<number | null>(null);
 
   const [uiStatus, setUiStatus] = useState<GameStatus>(engine.status);
@@ -135,13 +136,24 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({ engine, scanlines }) => 
     }
   }, []);
 
-  // Main Game Loop
+  // Main Game Loop with Fixed 60 FPS Time-Step (eliminates speed differences across 60Hz/120Hz/144Hz/240Hz monitors)
   const gameLoop = useCallback((now: number) => {
-    const delta = (now - lastTimeRef.current) / 1000;
+    let frameTime = (now - lastTimeRef.current) / 1000;
     lastTimeRef.current = now;
 
-    // Update physics & entities
-    engine.update(Math.min(delta, 0.05));
+    // Guard against huge delta spikes (e.g. background tab or lag freeze)
+    if (frameTime > 0.1) frameTime = 0.1;
+    if (frameTime < 0) frameTime = 0;
+
+    accumulatorRef.current += frameTime;
+    const FIXED_TIME_STEP = 1 / 60; // Exact 60 updates per second (16.66ms per tick)
+    let updateTicks = 0;
+
+    while (accumulatorRef.current >= FIXED_TIME_STEP && updateTicks < 5) {
+      engine.update(FIXED_TIME_STEP);
+      accumulatorRef.current -= FIXED_TIME_STEP;
+      updateTicks++;
+    }
 
     // Update React HUD state periodically
     setUiStatus(engine.status);
